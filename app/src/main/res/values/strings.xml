@@ -1,3 +1,18 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">CountDownLocker</string>
+    <string name="android">Android</string>
+    <string name="please_active">Hello! Please active the device manager first! Then the app could lock your screen after countdown.</string>
+    <string name="lock_now">Lock Now</string>
+    <string name="active_device_manager">Active Device Admin</string>
+    <string name="already_active">Device Manager already active.</string>
+    <string name="please_active_first">Please active first!</string>
+    <string name="active">Active!</string>
+    <string name="remain_count">Remain <xliff:g example="148" id="remain">%d</xliff:g></string>
+    <string name="how_many">Please input how many minutes to count down.</string>
+    <string name="start">Start!</string>
+    <string name="start_to_count_down">Start to count down!</string>
+    <string name="deactivate">Deactivate!</string>
+    <string name="deactivate_device_manager">Deactivate</string>
+    <string name="deactivate_content">Deactivate this device admin app.</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

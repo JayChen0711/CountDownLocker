@@ -4,11 +4,12 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.os.Build.VERSION_CODES
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
@@ -32,11 +33,10 @@ class CountdownService : Service() {
     }
 
 
-    @RequiresApi(VERSION_CODES.Q)
+    @RequiresApi(VERSION_CODES.S)
     private fun startCountDownNotification(minutes: Int) {
 
         startForeground(COUNTDOWN_NOTIFICATION_ID, getNotification(minutes * 60000L))
-
 
         val deviceManager = DeviceManager(this)
         object : CountDownTimer(minutes * 60000L, 1000L) {
@@ -44,6 +44,13 @@ class CountdownService : Service() {
 
             override fun onTick(millisUntilFinished: Long) {
                 manager.notify(COUNTDOWN_NOTIFICATION_ID, getNotification(millisUntilFinished))
+                if ((millisUntilFinished / 1000 % 60).toInt() == 10) {
+                    Toast.makeText(
+                        this@CountdownService,
+                        getString(R.string.lock_in_10),
+                        LENGTH_SHORT
+                    ).show()
+                }
             }
 
             override fun onFinish() {
@@ -55,24 +62,24 @@ class CountdownService : Service() {
         }.start()
     }
 
+
+    @RequiresApi(VERSION_CODES.S)
     private fun getNotification(millisUntilFinished: Long): Notification {
         val expireTimeInMillisecond = Date().time + millisUntilFinished
         val expired =
             SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(expireTimeInMillisecond))
-        return Notification.Builder(this, CHANNEL_ID)
+        val time = String.format(
+            Locale.getDefault(),
+            "%02d:%02d",
+            millisUntilFinished / 60000,
+            millisUntilFinished / 1000 % 60
+        )
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_notification)
             .setOnlyAlertOnce(true)
-            .setContentTitle(
-                "Lock after ${
-                    String.format(
-                        Locale.getDefault(),
-                        "%02d:%02d",
-                        millisUntilFinished / 60000,
-                        millisUntilFinished / 1000 % 60
-                    )
-                }"
-            )
-            .setContentText("Screen will be locked at $expired")
+            .setContentTitle(getString(R.string.lock_after, time))
+            .setContentText(getString(R.string.lock_at, expired))
+            .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
 

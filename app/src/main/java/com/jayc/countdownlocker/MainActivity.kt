@@ -100,20 +100,21 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun createNotificationChannel() {
         val channel =
-            NotificationChannel(CHANNEL_ID, "Countdown", NotificationManager.IMPORTANCE_DEFAULT)
+            NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
 
-        channel.description = "Used to show the countdown."
+        channel.description = getString(R.string.notification_channel_description)
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-
-
-        Toast.makeText(this, "Notification enable: ${areNotificationsEnabled()}", LENGTH_SHORT)
-            .show()
     }
 
     override fun onResume() {
         super.onResume()
         permissionState.activeState.value = DeviceManager(this).isActive()
+        permissionState.notificationState.value = areNotificationsEnabled()
     }
 }
 
@@ -161,7 +162,8 @@ fun MainInterface(
             Card(modifier = Modifier.padding(16.dp)) {
                 Text(
                     modifier = Modifier.padding(16.dp),
-                    text = "Please enable notification to make sure the app working properly."
+                    text = stringResource(R.string.enable_notification_suggestion),
+                            color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -171,7 +173,7 @@ fun MainInterface(
                 }
                 launcher.launch(intent)
             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text(text = "Enable Notification")
+                Text(text = stringResource(R.string.enable_notification))
             }
         }
 

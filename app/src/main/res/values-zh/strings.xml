@@ -7,7 +7,7 @@
     <string name="already_active">已经激活！</string>
     <string name="please_active_first">请先激活！</string>
     <string name="active">激活！</string>
-    <string name="remain_count">剩余 <xliff:g example="148" id="remain">%d</xliff:g></string>
+    <string name="lock_after">在 %1$s 后锁屏</string>
     <string name="how_many">请输入您想要倒计时的分钟数。</string>
     <string name="start">开始！</string>
     <string name="start_to_count_down">开始倒计时！</string>
@@ -15,4 +15,10 @@
     <string name="deactivate_device_manager">注销设备管理权限</string>
     <string name="deactivate_content">注销本App的设备管理权限。</string>
     <string name="dismiss">取消</string>
+    <string name="notification_channel_description">用于展示倒计时。</string>
+    <string name="notification_channel_name">倒计时</string>
+    <string name="enable_notification_suggestion">请开启推送确保本APP可以运行得更稳定。</string>
+    <string name="enable_notification">开启推送</string>
+    <string name="lock_at">将会在 %1$s 锁屏</string>
+    <string name="lock_in_10">即将在10秒后锁屏。</string>
 </resources>

@@ -44,7 +44,7 @@ class CountdownService : Service() {
 
             override fun onTick(millisUntilFinished: Long) {
                 manager.notify(COUNTDOWN_NOTIFICATION_ID, getNotification(millisUntilFinished))
-                if ((millisUntilFinished / 1000 % 60).toInt() == 10) {
+                if (millisUntilFinished < 60000 && (millisUntilFinished / 1000 % 60).toInt() == 10) {
                     Toast.makeText(
                         this@CountdownService,
                         getString(R.string.lock_in_10),

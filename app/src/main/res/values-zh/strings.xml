@@ -21,4 +21,6 @@
     <string name="enable_notification">开启推送</string>
     <string name="lock_at">将会在 %1$s 锁屏</string>
     <string name="lock_in_10">即将在10秒后锁屏。</string>
+    <string name="minutes">%1$d分钟</string>
+    <string name="more_info">更多说明</string>
 </resources>

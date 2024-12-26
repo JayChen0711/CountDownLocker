@@ -21,7 +21,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,8 +56,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.MutableLiveData
 import com.jayc.countdownlocker.CountdownService.Companion.CHANNEL_ID
@@ -116,6 +122,15 @@ class MainActivity : ComponentActivity() {
         permissionState.activeState.value = DeviceManager(this).isActive()
         permissionState.notificationState.value = areNotificationsEnabled()
     }
+
+    fun startCountdownService(minutes: Int) {
+        val intent = Intent(this, CountdownService::class.java)
+        intent.putExtra(EXTRA_MINUTES, minutes)
+        startService(intent)
+
+        Toast.makeText(this, getString(R.string.start_to_count_down), LENGTH_SHORT).show()
+        finish()
+    }
 }
 
 class PermissionState(
@@ -126,6 +141,54 @@ class PermissionState(
 fun Context.areNotificationsEnabled(): Boolean {
     val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     return notificationManager.areNotificationsEnabled()
+}
+
+@Preview
+@Composable
+fun QuickButton(minutes: Int = 1) {
+    val context = LocalContext.current
+    Button(onClick = {
+        if (context is MainActivity) {
+            context.startCountdownService(minutes)
+        }
+    }) {
+        Text(text = stringResource(id = R.string.minutes, minutes))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ActiveDeviceAdminPreview() {
+    Column {
+        ActiveDeviceAdmin(activeClick = {})
+    }
+}
+
+@Composable
+fun ActiveDeviceAdmin(activeClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.please_active),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = modifier
+            )
+        }
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = { activeClick.invoke() }) {
+            Text(text = stringResource(id = R.string.active_device_manager))
+        }
+//        Button(onClick = { }) {
+//            Text(text = stringResource(id = R.string.more_info))
+//        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,7 +226,7 @@ fun MainInterface(
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = stringResource(R.string.enable_notification_suggestion),
-                            color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -178,7 +241,6 @@ fun MainInterface(
         }
 
 
-        Spacer(modifier = Modifier.height(100.dp))
 
         Column(
             modifier = Modifier
@@ -190,28 +252,31 @@ fun MainInterface(
 
             if (!isActive) {
 
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.please_active),
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = modifier
-                        )
-                    }
+                Spacer(modifier = Modifier.height(100.dp))
+
+                ActiveDeviceAdmin(activeClick = { deviceManager.enableDeviceManager() })
+
+            } else {
+                var minutes by remember {
+                    mutableStateOf("")
                 }
-                Button(onClick = { deviceManager.enableDeviceManager() }) {
-                    Text(text = stringResource(id = R.string.active_device_manager))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    Text(
+                        modifier = Modifier.absolutePadding(right = 16.dp),
+                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                        text = "Quick"
+                    )
+                    QuickButton(minutes = 3)
+                    QuickButton(minutes = 5)
+                    QuickButton(minutes = 10)
                 }
-            }
-            var minutes by remember {
-                mutableStateOf("")
-            }
-            if (isActive) {
+
+
                 TextField(modifier = Modifier.width(IntrinsicSize.Max),
                     value = minutes,
                     label = { Text(text = stringResource(R.string.how_many)) },
@@ -223,17 +288,8 @@ fun MainInterface(
                 Button(modifier = Modifier.width(100.dp), onClick = {
                     if (minutes.isNotEmpty() && minutes.isDigitsOnly()) {
 
-                        val intent = Intent(context, CountdownService::class.java)
-                        intent.putExtra(EXTRA_MINUTES, minutes.toInt())
-                        context.startService(intent)
-
-                        if (context is Activity) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.start_to_count_down),
-                                LENGTH_SHORT
-                            ).show()
-                            context.finish()
+                        if (context is MainActivity) {
+                            context.startCountdownService(minutes.toInt())
                         }
                     } else {
                         if (context is Activity) {
